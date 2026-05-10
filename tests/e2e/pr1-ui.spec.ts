@@ -20,7 +20,7 @@ test.describe("破産防衛都市 PR1 UI", () => {
   test("建物配置、夜フェーズ、セーブが動く", async ({ page }) => {
     await page.getByRole("button", { name: "ゲストプレイ" }).click();
     await expect(page.getByTestId("phaser-game")).toBeVisible();
-    await page.getByRole("button", { name: "道路" }).click();
+    await page.getByTestId("select-Road").click();
     await page.mouse.click(240, 220);
     await page.getByRole("button", { name: "夜を開始" }).click();
     await expect(page.getByText("夜フェーズ")).toBeVisible();
@@ -37,7 +37,7 @@ test.describe("破産防衛都市 PR1 UI", () => {
     await expect(page.getByText("緊急つなぎ融資")).toBeVisible();
     await page.getByRole("button", { name: "カード" }).click();
     await expect(page.getByRole("heading", { name: "カード / デッキ" })).toBeVisible();
-    await expect(page.getByText("節税の達人")).toBeVisible();
+    await expect(page.getByTestId("inventory-cards").getByText("節税の達人")).toBeVisible();
   });
 
   test("360x640でも主要UIが操作できる", async ({ page }) => {

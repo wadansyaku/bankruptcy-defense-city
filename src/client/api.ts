@@ -134,7 +134,7 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ bannerId, pullCount, idempotencyKey: crypto.randomUUID(), turnstileToken }),
     });
-    return result.ok || result.error.code !== "internal_error"
+    return result.ok || !["internal_error", "unauthorized"].includes(result.error.code)
       ? result
       : ({ ok: true, data: fallbackRoll(bannerId, pullCount) } satisfies ApiResponse<GachaRollResult>);
   },

@@ -5,13 +5,27 @@
   padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
 }
 
+select {
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .brand,
 .nav,
 .cta-row,
 .action-grid,
 .inline-controls,
 .command-row,
-.phase-row {
+.phase-row,
+.filter-row,
+.landing-status,
+.gacha-meta,
+.incident-strip,
+.deck-slots {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -23,7 +37,8 @@
 .action-grid button,
 .inline-controls button,
 .command-row button,
-.panel button {
+.panel button,
+.filter-row button {
   min-height: 48px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -52,7 +67,8 @@
 .panel button.primary,
 .cta-row button.primary,
 .action-grid button.primary,
-.command-row button.primary {
+.command-row button.primary,
+.filter-row button.selected {
   color: #101514;
   border-color: transparent;
   background: var(--gold);
@@ -94,11 +110,67 @@
   margin: 0 auto;
 }
 
+.screen-label {
+  margin: 0;
+  color: var(--mint);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
 .app-shell .landing {
   display: grid;
   grid-template-columns: minmax(280px, 1fr) minmax(280px, 0.9fr);
   gap: 24px;
   align-items: center;
+}
+
+.landing-copy {
+  display: grid;
+  gap: 14px;
+}
+
+.landing-copy h1 {
+  margin: 0;
+  font-size: clamp(46px, 8vw, 86px);
+  line-height: 0.96;
+}
+
+.landing-copy p,
+.dashboard-hero-panel p,
+.gacha-banner p,
+.gacha-rates p,
+.selected-building-card p,
+.card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.landing-status,
+.gacha-meta,
+.incident-strip,
+.deck-slots,
+.filter-row {
+  flex-wrap: wrap;
+}
+
+.landing-status span,
+.gacha-meta span,
+.incident-strip span,
+.deck-slots span,
+.rarity-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 10px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sync-note {
+  font-size: 13px;
 }
 
 .hero-panel {
@@ -112,6 +184,34 @@
   object-fit: cover;
 }
 
+.dashboard,
+.map-screen,
+.game-layout,
+.gacha-layout,
+.inventory-layout {
+  display: grid;
+  gap: 16px;
+}
+
+.dashboard-hero-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  background:
+    linear-gradient(110deg, rgba(241, 196, 91, 0.12), transparent 46%),
+    rgba(24, 33, 31, 0.82);
+  box-shadow: var(--shadow);
+}
+
+.dashboard-hero-panel h2 {
+  margin: 0;
+  font-size: clamp(30px, 5vw, 52px);
+}
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -122,7 +222,13 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.metric-grid.operations {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .metric {
+  min-width: 0;
+  overflow: hidden;
   padding: 12px;
 }
 
@@ -135,19 +241,47 @@
 .metric strong {
   display: block;
   margin-top: 4px;
+  overflow-wrap: anywhere;
   font-size: 20px;
 }
 
-.dashboard,
-.map-screen,
-.game-layout {
-  display: grid;
-  gap: 16px;
+.metric-good strong {
+  color: var(--mint);
+}
+
+.metric-warn strong {
+  color: var(--gold);
+}
+
+.metric-danger strong {
+  color: var(--danger);
+}
+
+.metric-info strong {
+  color: var(--sky);
+}
+
+.incident-strip {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(16, 21, 20, 0.68);
 }
 
 .map-screen,
 .game-layout {
   grid-template-columns: minmax(0, 1fr) 360px;
+}
+
+.game-status-strip,
+.build-dock {
+  grid-column: 1 / -1;
+}
+
+.game-status-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(108px, 1fr));
+  gap: 8px;
 }
 
 .game-stage {
@@ -160,10 +294,130 @@
   overflow: hidden;
 }
 
+.mission-panel,
+.map-legend {
+  position: absolute;
+  z-index: 5;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: rgba(16, 21, 20, 0.76);
+  backdrop-filter: blur(14px);
+}
+
+.mission-panel {
+  top: 12px;
+  left: 12px;
+  display: grid;
+  gap: 4px;
+  max-width: min(260px, calc(100% - 24px));
+}
+
+.mission-panel span,
+.mission-panel small {
+  color: var(--muted);
+}
+
+.map-legend {
+  left: 12px;
+  bottom: 106px;
+  display: grid;
+  gap: 6px;
+}
+
+.map-legend span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.map-legend i {
+  width: 22px;
+  height: 3px;
+  border-radius: 999px;
+}
+
+.legend-power {
+  background: var(--sky);
+}
+
+.legend-danger {
+  background: var(--danger);
+}
+
+.legend-build {
+  background: var(--mint);
+}
+
 .hud {
   align-self: start;
   display: grid;
   gap: 12px;
+}
+
+.rail-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rail-tabs button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 0;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  font-weight: 850;
+}
+
+.rail-tabs .active {
+  color: #101514;
+  background: var(--gold);
+}
+
+.supply-cluster {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.section-title {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.section-title h2,
+.section-title h3 {
+  margin: 0;
+}
+
+.section-title span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.selected-building-card {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(241, 196, 91, 0.32);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(241, 196, 91, 0.08);
+}
+
+.selected-building-card span {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .build-list {
@@ -172,9 +426,53 @@
   gap: 8px;
 }
 
-.build-list .selected {
+.build-list button {
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  gap: 3px;
+  min-height: 64px;
+  text-align: left;
+}
+
+.build-list small,
+.build-dock small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.build-list .selected,
+.build-dock .selected {
   color: #101514;
   background: var(--gold);
+}
+
+.build-list .selected small,
+.build-dock .selected small {
+  color: rgba(16, 21, 20, 0.72);
+}
+
+.build-dock {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(106px, 1fr));
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(16, 21, 20, 0.82);
+}
+
+.build-dock button {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  min-height: 58px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  font-weight: 850;
 }
 
 .touch-placement-grid {
@@ -210,6 +508,7 @@
 }
 
 .enemy-banner {
+  color: #fff;
   background: rgba(238, 117, 105, 0.72);
   font-weight: 850;
 }
@@ -233,6 +532,137 @@
   background: rgba(238, 117, 105, 0.18);
 }
 
+.alert-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.alert-stack span {
+  border: 1px solid rgba(241, 196, 91, 0.3);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: rgba(241, 196, 91, 0.08);
+  font-size: 13px;
+}
+
+.log-drawer {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.log-drawer summary {
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.log-list {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.gacha-layout {
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+}
+
+.gacha-banner,
+.gacha-rates,
+.gacha-result {
+  display: grid;
+  gap: 14px;
+}
+
+.gacha-banner h2 {
+  margin: 0;
+  font-size: clamp(30px, 5vw, 54px);
+}
+
+.rate-bars {
+  display: grid;
+  gap: 10px;
+}
+
+.rate-bars div {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 10px;
+}
+
+.rate-bars i {
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--mint), var(--gold));
+}
+
+.gacha-result {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.gacha-result article,
+.card {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.gacha-result span,
+.card span {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.gacha-result small,
+.card small {
+  color: var(--muted);
+}
+
+.inventory-layout {
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+.inventory-main,
+.inventory-detail {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.deck-slots span {
+  min-width: 96px;
+  text-align: center;
+  border-style: dashed;
+}
+
+.inventory-detail blockquote {
+  margin: 0;
+  border-left: 3px solid var(--gold);
+  padding-left: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.rarity-UR {
+  border-color: rgba(238, 117, 105, 0.64);
+}
+
+.rarity-SR {
+  border-color: rgba(241, 196, 91, 0.56);
+}
+
+.rarity-R {
+  border-color: rgba(112, 184, 255, 0.48);
+}
+
 @media (max-width: 820px) {
   .topbar,
   .nav {
@@ -241,17 +671,49 @@
 
   .app-shell .landing,
   .map-screen,
-  .game-layout {
+  .game-layout,
+  .gacha-layout,
+  .inventory-layout {
     grid-template-columns: 1fr;
   }
 
-  .user-pill {
+  .dashboard-hero-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .metric-grid.operations,
+  .game-status-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .user-pill,
+  .map-legend {
     display: none;
+  }
+
+  .hud {
+    order: 3;
   }
 
   .game-stage,
   .phaser-shell {
     min-height: 500px;
+  }
+
+  .touch-placement-grid {
+    bottom: 142px;
+  }
+
+  .build-dock {
+    position: sticky;
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    z-index: 12;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gacha-result {
+    grid-template-columns: 1fr;
   }
 }
 
