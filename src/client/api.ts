@@ -1,4 +1,4 @@
-import type { ApiResponse, GachaBanner, GachaRollResult, GeneratedMap, MeResponse } from "../shared/apiTypes";
+import type { ApiResponse, ClientConfig, GachaBanner, GachaRollResult, GeneratedMap, MeResponse } from "../shared/apiTypes";
 import type { GameState } from "../shared/gameTypes";
 
 async function jsonFetch<T>(path: string, init?: RequestInit): Promise<ApiResponse<T>> {
@@ -56,14 +56,39 @@ function fallbackRoll(bannerId: string, pullCount: 1 | 10): GachaRollResult {
 }
 
 export const api = {
-  me: () => jsonFetch<MeResponse>("/api/auth/me"),
-  signup: async (email: string, username: string, password: string): Promise<ApiResponse<MeResponse>> => {
-    const result = await jsonFetch<MeResponse>("/api/auth/signup", { method: "POST", body: JSON.stringify({ email, username, password }) });
-    return result.ok ? result : { ok: true, data: mockUser(email, username) } satisfies ApiResponse<MeResponse>;
+  clientConfig: async (): Promise<ApiResponse<ClientConfig>> => {
+    const result = await jsonFetch<ClientConfig>("/api/client-config");
+    return result.ok
+      ? result
+      : ({
+          ok: true,
+          data: {
+            appEnv: "local",
+            turnstileSiteKey: null,
+            turnstileRequired: false,
+            codexImageModel: "gpt-image-2",
+            freeGachaDailyLimit: 3,
+          },
+        } satisfies ApiResponse<ClientConfig>);
   },
-  login: async (email: string, password: string): Promise<ApiResponse<MeResponse>> => {
-    const result = await jsonFetch<MeResponse>("/api/auth/login", { method: "POST", body: JSON.stringify({ email, password }) });
-    return result.ok ? result : { ok: true, data: mockUser(email) } satisfies ApiResponse<MeResponse>;
+  me: () => jsonFetch<MeResponse>("/api/auth/me"),
+  signup: async (email: string, username: string, password: string, turnstileToken?: string): Promise<ApiResponse<MeResponse>> => {
+    const result = await jsonFetch<MeResponse>("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify({ email, username, password, turnstileToken }),
+    });
+    return result.ok || result.error.code !== "internal_error"
+      ? result
+      : ({ ok: true, data: mockUser(email, username) } satisfies ApiResponse<MeResponse>);
+  },
+  login: async (email: string, password: string, turnstileToken?: string): Promise<ApiResponse<MeResponse>> => {
+    const result = await jsonFetch<MeResponse>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password, turnstileToken }),
+    });
+    return result.ok || result.error.code !== "internal_error"
+      ? result
+      : ({ ok: true, data: mockUser(email) } satisfies ApiResponse<MeResponse>);
   },
   logout: async (): Promise<ApiResponse<{ ok: true }>> => {
     const result = await jsonFetch<{ ok: true }>("/api/auth/logout", { method: "POST", body: "{}" });
@@ -104,11 +129,13 @@ export const api = {
           data: [{ id: "start-dash", slug: "start-dash", title: "スタートダッシュ", cost: 10, pityThreshold: 100, rates: [], startsAt: null, endsAt: null }],
         } satisfies ApiResponse<GachaBanner[]>);
   },
-  roll: async (bannerId: string, pullCount: 1 | 10): Promise<ApiResponse<GachaRollResult>> => {
+  roll: async (bannerId: string, pullCount: 1 | 10, turnstileToken?: string): Promise<ApiResponse<GachaRollResult>> => {
     const result = await jsonFetch<GachaRollResult>("/api/gacha/roll", {
       method: "POST",
-      body: JSON.stringify({ bannerId, pullCount, idempotencyKey: crypto.randomUUID() }),
+      body: JSON.stringify({ bannerId, pullCount, idempotencyKey: crypto.randomUUID(), turnstileToken }),
     });
-    return result.ok ? result : ({ ok: true, data: fallbackRoll(bannerId, pullCount) } satisfies ApiResponse<GachaRollResult>);
+    return result.ok || result.error.code !== "internal_error"
+      ? result
+      : ({ ok: true, data: fallbackRoll(bannerId, pullCount) } satisfies ApiResponse<GachaRollResult>);
   },
 };

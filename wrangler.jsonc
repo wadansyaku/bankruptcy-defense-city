@@ -46,7 +46,7 @@
       "vars": {
         "APP_ENV": "preview",
         "PUBLIC_APP_ORIGIN": "https://bankruptcy-defense-city-preview.kidsquestmissionjp.workers.dev",
-        "TURNSTILE_SITE_KEY": "replace-preview-turnstile-site-key",
+        "TURNSTILE_SITE_KEY": "0x4AAAAAADMs5DTcITmBWFpL",
         "CODEX_IMAGE_MODEL": "gpt-image-2",
         "ASSET_PUBLIC_BASE": "/assets/generated",
         "FREE_GACHA_DAILY_LIMIT": "3"
@@ -77,7 +77,7 @@
       "vars": {
         "APP_ENV": "production",
         "PUBLIC_APP_ORIGIN": "https://bankruptcy-defense-city.kidsquestmissionjp.workers.dev",
-        "TURNSTILE_SITE_KEY": "replace-production-turnstile-site-key",
+        "TURNSTILE_SITE_KEY": "0x4AAAAAADMs5DTcITmBWFpL",
         "CODEX_IMAGE_MODEL": "gpt-image-2",
         "ASSET_PUBLIC_BASE": "/assets/generated",
         "FREE_GACHA_DAILY_LIMIT": "3"

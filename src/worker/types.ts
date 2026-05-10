@@ -12,6 +12,10 @@ export interface Env {
   SESSION_SECRET?: string;
   RATE_LIMIT_SALT?: string;
   TURNSTILE_SECRET_KEY?: string;
+  TURNSTILE_SITE_KEY?: string;
+  PUBLIC_APP_ORIGIN?: string;
+  CODEX_IMAGE_MODEL?: string;
+  FREE_GACHA_DAILY_LIMIT?: string;
 }
 
 export type SessionContext = {

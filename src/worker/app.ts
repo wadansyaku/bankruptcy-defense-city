@@ -42,6 +42,16 @@ export function createApp(): Hono<AppBindings> {
 
   app.get("/api/health", (c) => ok(c, { service: "bankruptcy-defense-city-api", status: "ok" }));
 
+  app.get("/api/client-config", (c) =>
+    ok(c, {
+      appEnv: c.env.APP_ENV ?? "local",
+      turnstileSiteKey: c.env.TURNSTILE_SITE_KEY ?? null,
+      turnstileRequired: Boolean(c.env.TURNSTILE_SECRET_KEY || c.env.APP_ENV === "production" || c.env.APP_ENV === "preview"),
+      codexImageModel: c.env.CODEX_IMAGE_MODEL ?? "gpt-image-2",
+      freeGachaDailyLimit: Number(c.env.FREE_GACHA_DAILY_LIMIT ?? 3),
+    }),
+  );
+
   app.post("/api/auth/signup", async (c) => {
     const input = await parseJson(c, signupSchema);
     await verifyTurnstile(c.env, input.turnstileToken, c.req.header("CF-Connecting-IP") ?? undefined);

@@ -74,12 +74,15 @@ Create a Turnstile widget in Cloudflare dashboard, then set:
 - `TURNSTILE_SECRET_KEY` as a Worker secret.
 
 ```bash
-npx wrangler secret put TURNSTILE_SECRET_KEY
-npx wrangler secret put SESSION_SECRET
-npx wrangler secret put RATE_LIMIT_SALT
+npx wrangler secret put TURNSTILE_SECRET_KEY --env preview --config wrangler.jsonc
+npx wrangler secret put TURNSTILE_SECRET_KEY --env production --config wrangler.jsonc
+npx wrangler secret put SESSION_SECRET --env preview --config wrangler.jsonc
+npx wrangler secret put SESSION_SECRET --env production --config wrangler.jsonc
+npx wrangler secret put RATE_LIMIT_SALT --env preview --config wrangler.jsonc
+npx wrangler secret put RATE_LIMIT_SALT --env production --config wrangler.jsonc
 ```
 
-Use Cloudflare test keys only for local or preview smoke.
+Use Cloudflare test keys only for local smoke. Preview and production use the real Turnstile site key and environment-specific Worker secrets.
 
 ## Codex GPT Image2 Assets
 
@@ -103,8 +106,10 @@ npx wrangler deploy
 After deploy:
 
 ```bash
-curl -I https://<worker-url>/
-curl https://<worker-url>/api/health
+curl -I https://bankruptcy-defense-city-preview.kidsquestmissionjp.workers.dev/
+curl https://bankruptcy-defense-city-preview.kidsquestmissionjp.workers.dev/api/health
+curl -I https://bankruptcy-defense-city.kidsquestmissionjp.workers.dev/
+curl https://bankruptcy-defense-city.kidsquestmissionjp.workers.dev/api/health
 ```
 
 ## Preflight Checklist

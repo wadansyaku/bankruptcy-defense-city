@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BUILDING_DEFINITIONS } from "../shared/constants";
-import type { AuthUser, GachaBanner, GachaRollResult, MeResponse } from "../shared/apiTypes";
+import type { AuthUser, ClientConfig, GachaBanner, GachaRollResult, MeResponse } from "../shared/apiTypes";
 import type { Biome, BuildingKey, GameMap } from "../shared/gameTypes";
 import { api } from "./api";
 import { PhaserGame } from "./game/phaser/PhaserGame";
@@ -11,6 +11,97 @@ import { useGameStore } from "./game/state/gameStore";
 import { useUiStore } from "./game/state/uiStore";
 
 const buildKeys = Object.keys(BUILDING_DEFINITIONS).filter((key) => BUILDING_DEFINITIONS[key as BuildingKey].buildable) as BuildingKey[];
+
+type TurnstileApi = {
+  render: (
+    element: HTMLElement,
+    options: {
+      sitekey: string;
+      action?: string;
+      theme?: "auto" | "light" | "dark";
+      callback: (token: string) => void;
+      "expired-callback": () => void;
+      "error-callback": () => void;
+    },
+  ) => string;
+  remove?: (widgetId: string) => void;
+};
+
+declare global {
+  interface Window {
+    turnstile?: TurnstileApi;
+    __bankruptcyTurnstileScript?: Promise<void>;
+  }
+}
+
+function loadTurnstileScript(): Promise<void> {
+  if (window.turnstile) return Promise.resolve();
+  if (window.__bankruptcyTurnstileScript) return window.__bankruptcyTurnstileScript;
+
+  window.__bankruptcyTurnstileScript = new Promise((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>("script[data-bankruptcy-turnstile]");
+    if (existing) {
+      existing.addEventListener("load", () => resolve(), { once: true });
+      existing.addEventListener("error", () => reject(new Error("turnstile script failed")), { once: true });
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.async = true;
+    script.defer = true;
+    script.dataset.bankruptcyTurnstile = "1";
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("turnstile script failed"));
+    document.head.appendChild(script);
+  });
+
+  return window.__bankruptcyTurnstileScript;
+}
+
+function TurnstileWidget({
+  siteKey,
+  action,
+  onToken,
+}: {
+  siteKey: string | null | undefined;
+  action: string;
+  onToken: (token: string) => void;
+}): JSX.Element {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    onToken("");
+    if (!siteKey) return undefined;
+    let cancelled = false;
+    let widgetId: string | null = null;
+
+    loadTurnstileScript()
+      .then(() => {
+        if (cancelled || !containerRef.current || !window.turnstile) return;
+        containerRef.current.replaceChildren();
+        widgetId = window.turnstile.render(containerRef.current, {
+          sitekey: siteKey,
+          action,
+          theme: "auto",
+          callback: onToken,
+          "expired-callback": () => onToken(""),
+          "error-callback": () => onToken(""),
+        });
+      })
+      .catch(() => onToken(""));
+
+    return () => {
+      cancelled = true;
+      if (widgetId && window.turnstile?.remove) window.turnstile.remove(widgetId);
+    };
+  }, [action, onToken, siteKey]);
+
+  if (!siteKey) {
+    return <div className="turnstile-placeholder">Turnstile: ローカル開発では secret 未設定時に検証をバイパス</div>;
+  }
+
+  return <div className="turnstile-widget" ref={containerRef} aria-label="Turnstile 検証" />;
+}
 
 export function App(): JSX.Element {
   const { route, setRoute } = useUiStore();
@@ -79,15 +170,37 @@ function AuthScreen({ mode, onUser, onDone }: { mode: "login" | "signup"; onUser
   const [username, setUsername] = useState("倒産寸前市長");
   const [password, setPassword] = useState("password-demo-123");
   const [error, setError] = useState("");
+  const [clientConfig, setClientConfig] = useState<ClientConfig | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
+  const setToken = useCallback((token: string) => setTurnstileToken(token), []);
+  const requiresTurnstile = Boolean(clientConfig?.turnstileRequired && clientConfig.turnstileSiteKey);
+
+  useEffect(() => {
+    api.clientConfig().then((result) => {
+      if (result.ok) setClientConfig(result.data);
+    });
+  }, []);
+
   const submit = async (): Promise<void> => {
     setError("");
-    const result = mode === "signup" ? await api.signup(email, username, password) : await api.login(email, password);
+    if (requiresTurnstile && !turnstileToken) {
+      setError("Turnstile の確認が完了していません。少し待ってからもう一度押してください。");
+      return;
+    }
+
+    const result =
+      mode === "signup"
+        ? await api.signup(email, username, password, turnstileToken || undefined)
+        : await api.login(email, password, turnstileToken || undefined);
     if (result.ok) {
       onUser((result.data as MeResponse).user);
       localStorage.setItem("bankruptcy-defense-city:session-hint", "1");
       onDone();
     } else {
       setError(result.error.message);
+      setTurnstileToken("");
+      setTurnstileReset((value) => value + 1);
     }
   };
   return (
@@ -96,7 +209,7 @@ function AuthScreen({ mode, onUser, onDone }: { mode: "login" | "signup"; onUser
       <label>メールアドレス<input value={email} onChange={(event) => setEmail(event.target.value)} /></label>
       {mode === "signup" && <label>ユーザー名<input value={username} onChange={(event) => setUsername(event.target.value)} /></label>}
       <label>パスワード<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></label>
-      <div className="turnstile-placeholder">Turnstile: ローカル開発では secret 未設定時に検証をバイパス</div>
+      <TurnstileWidget key={`${mode}-${turnstileReset}`} siteKey={clientConfig?.turnstileSiteKey} action={mode} onToken={setToken} />
       {error && <p className="error">{error}</p>}
       <button className="primary" onClick={submit} data-testid={mode === "signup" ? "signup-submit" : "login-submit"}>
         {mode === "signup" ? "登録して本社を守る" : "ログイン"}
@@ -219,16 +332,33 @@ function GachaScreen(): JSX.Element {
   const [banner, setBanner] = useState<GachaBanner | null>(null);
   const [result, setResult] = useState<GachaRollResult | null>(null);
   const [error, setError] = useState("");
+  const [clientConfig, setClientConfig] = useState<ClientConfig | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
+  const setToken = useCallback((token: string) => setTurnstileToken(token), []);
+  const requiresTurnstile = Boolean(clientConfig?.turnstileRequired && clientConfig.turnstileSiteKey);
   useEffect(() => { api.banners().then((res) => { if (res.ok) setBanner(res.data[0]); }); }, []);
+  useEffect(() => {
+    api.clientConfig().then((res) => {
+      if (res.ok) setClientConfig(res.data);
+    });
+  }, []);
   const roll = async (pullCount: 1 | 10): Promise<void> => {
     setError("");
-    const res = await api.roll(banner?.id ?? "start-dash", pullCount);
+    if (requiresTurnstile && !turnstileToken) {
+      setError("Turnstile の確認を待っています。無料通貨の安全確認なので少しだけお待ちください。");
+      return;
+    }
+    const res = await api.roll(banner?.id ?? "start-dash", pullCount, turnstileToken || undefined);
     if (res.ok) setResult(res.data); else setError(res.error.message);
+    setTurnstileToken("");
+    setTurnstileReset((value) => value + 1);
   };
   return (
     <section className="panel">
       <h2>ガチャ: 破産防衛スタートダッシュ</h2>
       <p>無料ゲーム内通貨のみ使用。N 70% / R 22% / SR 7% / UR 1%。10連はR以上1枚保証、100連でUR天井。</p>
+      <TurnstileWidget key={`gacha-${turnstileReset}`} siteKey={clientConfig?.turnstileSiteKey} action="gacha" onToken={setToken} />
       <div className="cta-row"><button className="primary" onClick={() => roll(1)} data-testid="pull-gacha">1回引く</button><button onClick={() => roll(10)}>10回引く</button></div>
       {error && <p className="error">{error}</p>}
       {result && <div className="gacha-result" data-testid="gacha-result">{result.results.map((card) => <article key={`${result.rollId}-${card.itemKey}`}><strong>{card.name}</strong><span>{card.rarity}</span></article>)}</div>}

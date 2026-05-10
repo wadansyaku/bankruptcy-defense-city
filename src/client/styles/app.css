@@ -202,6 +202,7 @@
 
 .enemy-banner,
 .save-status,
+.turnstile-widget,
 .turnstile-placeholder,
 .error {
   border-radius: 8px;
@@ -217,6 +218,15 @@
 .turnstile-placeholder {
   color: var(--muted);
   background: rgba(255, 255, 255, 0.05);
+}
+
+.turnstile-widget {
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .error {

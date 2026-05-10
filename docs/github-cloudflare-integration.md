@@ -21,15 +21,16 @@ Workflows:
 - `.github/workflows/cloudflare-deploy.yml`: `main` push で production deploy、manual dispatch で preview / production deploy。
 - `.github/dependabot.yml`: npm dependency updates。
 
-この環境には GitHub CLI が入っていないため、外部GitHub repoの作成とpushは未実行です。GitHub側では、このディレクトリをrepo化したあと、remoteを設定してpushしてください。
+GitHub repo:
 
 ```bash
-git init -b main
-git add .
-git commit -m "PR1 bankruptcy defense city"
-git remote add origin git@github.com:<owner>/bankruptcy-defense-city.git
-git push -u origin main
+git remote -v
 ```
+
+- `https://github.com/wadansyaku/bankruptcy-defense-city`
+- `main` tracks `origin/main`
+- GitHub Actions secrets `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` are configured.
+- Production deploy workflow has completed successfully.
 
 ## Cloudflare
 
@@ -41,6 +42,9 @@ Created resources:
 - R2 preview: `bankruptcy-defense-city-assets-preview`
 - KV production: `bankruptcy-defense-city-config` / `2d7211d84fd44db589684823b7eee360`
 - KV preview: `bankruptcy-defense-city-config-preview` / `7262ea9dc1964dafaf45122434ba894f`
+- Turnstile widget: `bankruptcy-defense-city`
+  - site key is configured in `wrangler.jsonc` for preview and production.
+  - secret key is stored only as Cloudflare Worker secret `TURNSTILE_SECRET_KEY` for preview and production.
 
 Apply migrations:
 
@@ -59,6 +63,13 @@ npm run cf:deploy
 ```
 
 Deploy commands explicitly pass `--config wrangler.jsonc` so Wrangler uses the requested `preview` / `production` environment instead of the Cloudflare Vite plugin's generated redirect config.
+
+Smoke:
+
+```bash
+curl https://bankruptcy-defense-city-preview.kidsquestmissionjp.workers.dev/api/health
+curl https://bankruptcy-defense-city.kidsquestmissionjp.workers.dev/api/health
+```
 
 ## Codex GPT Image2 Assets
 

@@ -37,6 +37,14 @@ export type UserProfile = {
   updatedAt: string;
 };
 
+export type ClientConfig = {
+  appEnv: string;
+  turnstileSiteKey: string | null;
+  turnstileRequired: boolean;
+  codexImageModel: string;
+  freeGachaDailyLimit: number;
+};
+
 export type SignupRequest = {
   email: string;
   password: string;
