@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+.DS_Store
+coverage/
+test-results/
+playwright-report/
+output/
+generated/*
+!generated/.gitkeep
+!generated/codex-image2-source/
+generated/codex-image2-source/*
+!generated/codex-image2-source/.gitkeep
+public/assets/generated/*
+!public/assets/generated/.gitkeep

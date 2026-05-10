@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="破産防衛都市">
+  <rect width="128" height="128" rx="20" fill="#151515"/>
+  <path d="M20 92h88v14H20zM30 58h18v34H30zM56 34h18v58H56zM82 48h18v44H82z" fill="#f0b23d"/>
+  <path d="M22 28h84l-10 18H32z" fill="#66d0c7"/>
+  <text x="64" y="82" text-anchor="middle" font-family="sans-serif" font-size="36" font-weight="900" fill="#151515">破</text>
+</svg>

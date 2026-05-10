@@ -1,0 +1,795 @@
+:root {
+  color-scheme: dark;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #101514;
+  color: #f7f4e8;
+  --bg: #101514;
+  --panel: #18211f;
+  --panel-2: #20302c;
+  --line: rgba(247, 244, 232, 0.14);
+  --text: #f7f4e8;
+  --muted: #b7c1b6;
+  --gold: #f1c45b;
+  --mint: #64d39a;
+  --danger: #ee7569;
+  --sky: #70b8ff;
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(112, 184, 255, 0.16), transparent 32rem),
+    linear-gradient(135deg, #111917 0%, #171611 50%, #11161b 100%);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-root {
+  min-height: 100svh;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left));
+  border-bottom: 1px solid var(--line);
+  background: rgba(16, 21, 20, 0.86);
+  backdrop-filter: blur(18px);
+}
+
+.brand-button,
+.topbar-actions,
+.hud-actions,
+.landing-actions,
+.hero-actions,
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-button,
+.bottom-nav button,
+.text-button {
+  color: var(--text);
+  border: 0;
+  background: transparent;
+}
+
+.brand-button {
+  min-height: 42px;
+  padding: 0;
+  font-weight: 800;
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.user-chip,
+.sync-chip,
+.notice-bar {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 10px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+}
+
+.sync-chip {
+  color: #18211f;
+  background: var(--gold);
+  border-color: transparent;
+  font-weight: 800;
+}
+
+.notice-bar {
+  margin: 10px 16px 0;
+  color: var(--text);
+  border-radius: 10px;
+}
+
+.busy-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: rgba(16, 21, 20, 0.62);
+  font-weight: 900;
+}
+
+.main-view {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 18px 16px calc(96px + env(safe-area-inset-bottom));
+}
+
+.landing,
+.auth-screen,
+.map-screen,
+.dashboard,
+.gacha-screen,
+.inventory-screen,
+.settings-screen {
+  min-height: calc(100svh - 150px);
+}
+
+.landing {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(300px, 1.1fr);
+  align-items: center;
+  gap: 28px;
+}
+
+.landing-visual {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: linear-gradient(155deg, rgba(241, 196, 91, 0.12), rgba(100, 211, 154, 0.1));
+  box-shadow: var(--shadow);
+}
+
+.landing-visual img {
+  display: block;
+  width: 100%;
+  min-height: 300px;
+  object-fit: cover;
+}
+
+.landing-copy h1,
+.auth-panel h1,
+.map-copy h1,
+.dashboard-hero h1,
+.gacha-machine h1,
+.section-head h1 {
+  margin: 0;
+  font-size: clamp(34px, 7vw, 72px);
+  line-height: 0.96;
+}
+
+.landing-copy p,
+.auth-panel p,
+.map-copy p,
+.dashboard-hero p,
+.gacha-machine p {
+  max-width: 620px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+.primary-action,
+.secondary-action,
+.danger-action,
+.hud-actions button,
+.build-options button {
+  min-height: 48px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0 16px;
+  font-weight: 850;
+  color: #101514;
+  background: var(--gold);
+}
+
+.primary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.secondary-action,
+.hud-actions button {
+  color: var(--text);
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.danger-action {
+  color: #fff;
+  background: var(--danger);
+}
+
+.screen-label {
+  margin: 0 0 10px;
+  color: var(--mint);
+  font-weight: 850;
+}
+
+.auth-screen,
+.map-screen,
+.gacha-screen {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 22px;
+}
+
+.auth-panel,
+.map-builder,
+.gacha-machine,
+.card-prize,
+.dashboard-hero,
+.status-grid article,
+.inventory-card,
+.settings-list,
+.settings-actions {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(24, 33, 31, 0.82);
+  box-shadow: var(--shadow);
+}
+
+.auth-panel,
+.map-builder,
+.gacha-machine,
+.card-prize,
+.dashboard-hero {
+  padding: 22px;
+}
+
+.stack-form,
+.map-builder,
+.settings-list {
+  display: grid;
+  gap: 14px;
+}
+
+label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.text-button {
+  margin-top: 14px;
+  padding: 0;
+  color: var(--gold);
+  font-weight: 800;
+}
+
+.dashboard {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.status-grid article {
+  padding: 16px;
+}
+
+.status-grid span,
+.game-hud span,
+.card-prize span,
+.inventory-card span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.status-grid strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 30px;
+}
+
+.map-preview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  aspect-ratio: 1;
+}
+
+.map-preview span {
+  border-radius: 6px;
+  background: rgba(100, 211, 154, 0.22);
+}
+
+.map-preview .road {
+  background: rgba(241, 196, 91, 0.26);
+}
+
+.map-preview .blocked {
+  background: rgba(238, 117, 105, 0.24);
+}
+
+.game-screen {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  min-height: calc(100svh - 150px);
+}
+
+.game-hud {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(16, 21, 20, 0.78);
+}
+
+.hud-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.hud-row div {
+  min-width: 0;
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.hud-row strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 20px;
+}
+
+.pressure-meter {
+  position: relative;
+  overflow: hidden;
+  min-height: 28px;
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.pressure-meter span {
+  position: relative;
+  z-index: 1;
+  color: var(--text);
+  font-weight: 800;
+}
+
+.pressure-meter i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(90deg, rgba(241, 196, 91, 0.5), rgba(238, 117, 105, 0.7));
+}
+
+.enemy-banner {
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #fff;
+  background: rgba(238, 117, 105, 0.72);
+  font-weight: 850;
+}
+
+.playfield {
+  position: relative;
+  min-height: 440px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #16201d;
+}
+
+.phaser-frame,
+.phaser-host {
+  position: absolute;
+  inset: 0;
+}
+
+.phaser-host {
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.phaser-fallback {
+  display: grid;
+  place-items: center;
+  gap: 6px;
+  width: min(220px, 60%);
+  aspect-ratio: 1;
+  border: 1px solid rgba(241, 196, 91, 0.35);
+  border-radius: 50%;
+  background: rgba(241, 196, 91, 0.1);
+}
+
+.phaser-fallback span {
+  font-weight: 900;
+}
+
+.phaser-fallback small {
+  color: var(--muted);
+}
+
+.city-grid {
+  position: absolute;
+  inset: 18px 18px 156px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(44px, 1fr));
+  grid-template-rows: repeat(4, minmax(44px, 1fr));
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.tile {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid rgba(247, 244, 232, 0.2);
+  border-radius: 8px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  font-weight: 900;
+}
+
+.tile.has-building {
+  border-color: rgba(241, 196, 91, 0.55);
+  background: rgba(241, 196, 91, 0.23);
+}
+
+.tile.market {
+  background: rgba(100, 211, 154, 0.24);
+}
+
+.tile.watch {
+  background: rgba(112, 184, 255, 0.24);
+}
+
+.tile.clinic {
+  background: rgba(238, 117, 105, 0.2);
+}
+
+.build-sheet {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  z-index: 10;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(24, 33, 31, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.left-hand .build-sheet {
+  right: 48px;
+  left: 10px;
+}
+
+.sheet-handle {
+  width: 42px;
+  height: 4px;
+  margin: 0 auto 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.sheet-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--muted);
+}
+
+.sheet-title strong {
+  color: var(--text);
+}
+
+.build-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.build-options button {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 2px;
+  min-height: 70px;
+  padding: 8px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.build-options button.active {
+  color: #101514;
+  background: var(--gold);
+}
+
+.build-options small,
+.build-options span {
+  font-size: 11px;
+}
+
+.gacha-screen {
+  grid-template-columns: 1.1fr 0.9fr;
+}
+
+.card-prize,
+.inventory-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-prize::before,
+.inventory-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(241, 196, 91, 0.16), transparent);
+  pointer-events: none;
+}
+
+.card-prize h2,
+.inventory-card h2 {
+  margin: 10px 0;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.inventory-card {
+  padding: 16px;
+}
+
+.rarity-SR {
+  border-color: rgba(241, 196, 91, 0.56);
+}
+
+.rarity-R {
+  border-color: rgba(112, 184, 255, 0.48);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.toggle-row:last-child {
+  border-bottom: 0;
+}
+
+.toggle-row span {
+  display: grid;
+  gap: 4px;
+}
+
+.toggle-row small {
+  color: var(--muted);
+}
+
+.toggle-row input {
+  width: 54px;
+  min-height: 32px;
+  accent-color: var(--gold);
+}
+
+.settings-actions {
+  margin-top: 14px;
+  padding: 14px;
+  justify-content: space-between;
+}
+
+.bottom-nav {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  padding: 8px max(10px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom))
+    max(10px, env(safe-area-inset-left));
+  border-top: 1px solid var(--line);
+  background: rgba(16, 21, 20, 0.92);
+  backdrop-filter: blur(18px);
+}
+
+.bottom-nav button {
+  display: grid;
+  place-items: center;
+  gap: 3px;
+  min-height: 58px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.bottom-nav button.active {
+  color: #101514;
+  background: var(--gold);
+}
+
+.large-controls .bottom-nav button,
+.large-controls .primary-action,
+.large-controls .secondary-action,
+.large-controls .danger-action {
+  min-height: 54px;
+}
+
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  scroll-behavior: auto !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .main-view {
+    padding-bottom: 76px;
+  }
+
+  .game-screen {
+    grid-template-columns: 320px minmax(420px, 1fr);
+    grid-template-rows: 1fr;
+  }
+
+  .game-hud {
+    align-self: start;
+  }
+
+  .playfield {
+    min-height: calc(100svh - 118px);
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-left: max(12px, env(safe-area-inset-left));
+  }
+
+  .user-chip {
+    display: none;
+  }
+
+  .main-view {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .landing,
+  .auth-screen,
+  .map-screen,
+  .gacha-screen {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .landing {
+    gap: 18px;
+  }
+
+  .landing-visual {
+    order: -1;
+  }
+
+  .landing-visual img {
+    min-height: 210px;
+  }
+
+  .landing-copy h1,
+  .auth-panel h1,
+  .map-copy h1,
+  .dashboard-hero h1,
+  .gacha-machine h1,
+  .section-head h1 {
+    font-size: 42px;
+  }
+
+  .landing-actions,
+  .hero-actions,
+  .settings-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .status-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hud-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .playfield {
+    min-height: 500px;
+  }
+
+  .city-grid {
+    inset: 16px 12px 178px;
+    gap: 7px;
+  }
+
+  .build-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 380px) {
+  .main-view {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .landing-copy h1,
+  .auth-panel h1,
+  .map-copy h1,
+  .dashboard-hero h1,
+  .gacha-machine h1,
+  .section-head h1 {
+    font-size: 36px;
+  }
+
+  .bottom-nav button {
+    min-height: 54px;
+    font-size: 11px;
+  }
+
+  .bottom-nav .icon {
+    width: 19px;
+    height: 19px;
+  }
+
+  .build-options button {
+    min-height: 64px;
+  }
+}

@@ -1,0 +1,23 @@
+# Local-only development variables. Copy this file to .dev.vars and keep secrets out of git.
+
+APP_ENV=local
+PUBLIC_APP_ORIGIN=http://localhost:8787
+
+# Codex GPT image2 is used through Codex-generated local files, not an API key.
+CODEX_IMAGE_MODEL=gpt-image-2
+CODEX_IMAGE2_SOURCE_DIR=generated/codex-image2-source
+
+# Turnstile test keys/placeholders. Replace before preview/production use.
+TURNSTILE_SITE_KEY=1x00000000000000000000AA
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+
+# Optional local auth/session placeholders.
+SESSION_SECRET=replace-with-local-random-secret
+RATE_LIMIT_SALT=replace-with-local-rate-limit-salt
+SESSION_COOKIE_NAME=bankruptcy_defense_session
+GUEST_SESSION_TTL_SECONDS=604800
+
+# R2 upload script defaults.
+R2_BUCKET_NAME=bankruptcy-defense-city-assets
+R2_ASSET_PREFIX=generated
+R2_REMOTE=1

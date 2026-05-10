@@ -1,0 +1,19 @@
+{
+  "name": "破産防衛都市",
+  "short_name": "破産防衛",
+  "description": "債務圧から都市を守る防衛PWA",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#101514",
+  "theme_color": "#101514",
+  "icons": [
+    {
+      "src": "/assets/placeholders/city-core.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

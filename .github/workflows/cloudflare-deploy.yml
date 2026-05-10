@@ -1,0 +1,61 @@
+name: Cloudflare Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Cloudflare Wrangler environment"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - production
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run test
+          npm run build
+
+      - name: Apply preview D1 migrations
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'preview' }}
+        run: npx wrangler d1 migrations apply DB --env preview --remote
+
+      - name: Apply production D1 migrations
+        if: ${{ github.event_name == 'push' || github.event.inputs.environment == 'production' }}
+        run: npx wrangler d1 migrations apply bankruptcy-defense-city --remote
+
+      - name: Deploy preview
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'preview' }}
+        run: npx wrangler deploy --config wrangler.jsonc --env preview
+
+      - name: Deploy production
+        if: ${{ github.event_name == 'push' || github.event.inputs.environment == 'production' }}
+        run: npx wrangler deploy --config wrangler.jsonc --env production

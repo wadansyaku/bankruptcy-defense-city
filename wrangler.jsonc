@@ -1,0 +1,107 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "bankruptcy-defense-city",
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2026-05-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "vars": {
+    "APP_ENV": "local",
+    "PUBLIC_APP_ORIGIN": "http://localhost:8787",
+    "TURNSTILE_SITE_KEY": "1x00000000000000000000AA",
+    "CODEX_IMAGE_MODEL": "gpt-image-2",
+    "ASSET_PUBLIC_BASE": "/assets/generated",
+    "FREE_GACHA_DAILY_LIMIT": "3"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bankruptcy-defense-city",
+      "database_id": "55f0af37-d10c-4285-9ad5-a1cdfc597adc",
+      "migrations_dir": "./migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "ASSETS_BUCKET",
+      "bucket_name": "bankruptcy-defense-city-assets",
+      "preview_bucket_name": "bankruptcy-defense-city-assets-preview"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "CONFIG_KV",
+      "id": "2d7211d84fd44db589684823b7eee360",
+      "preview_id": "7262ea9dc1964dafaf45122434ba894f"
+    }
+  ],
+  "env": {
+    "preview": {
+      "name": "bankruptcy-defense-city-preview",
+      "vars": {
+        "APP_ENV": "preview",
+        "PUBLIC_APP_ORIGIN": "https://bankruptcy-defense-city-preview.kidsquestmissionjp.workers.dev",
+        "TURNSTILE_SITE_KEY": "replace-preview-turnstile-site-key",
+        "CODEX_IMAGE_MODEL": "gpt-image-2",
+        "ASSET_PUBLIC_BASE": "/assets/generated",
+        "FREE_GACHA_DAILY_LIMIT": "3"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "bankruptcy-defense-city-preview",
+          "database_id": "7e5ef27d-642e-4e90-99dc-fc21a379179e",
+          "migrations_dir": "./migrations"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "ASSETS_BUCKET",
+          "bucket_name": "bankruptcy-defense-city-assets-preview"
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "CONFIG_KV",
+          "id": "7262ea9dc1964dafaf45122434ba894f"
+        }
+      ]
+    },
+    "production": {
+      "name": "bankruptcy-defense-city",
+      "vars": {
+        "APP_ENV": "production",
+        "PUBLIC_APP_ORIGIN": "https://bankruptcy-defense-city.kidsquestmissionjp.workers.dev",
+        "TURNSTILE_SITE_KEY": "replace-production-turnstile-site-key",
+        "CODEX_IMAGE_MODEL": "gpt-image-2",
+        "ASSET_PUBLIC_BASE": "/assets/generated",
+        "FREE_GACHA_DAILY_LIMIT": "3"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "bankruptcy-defense-city",
+          "database_id": "55f0af37-d10c-4285-9ad5-a1cdfc597adc",
+          "migrations_dir": "./migrations"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "ASSETS_BUCKET",
+          "bucket_name": "bankruptcy-defense-city-assets"
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "CONFIG_KV",
+          "id": "2d7211d84fd44db589684823b7eee360"
+        }
+      ]
+    }
+  }
+}
