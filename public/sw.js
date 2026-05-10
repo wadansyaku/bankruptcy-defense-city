@@ -1,4 +1,4 @@
-const CACHE_NAME = "bankruptcy-defense-city-pr1-v1";
+const CACHE_NAME = "bankruptcy-defense-city-pr1-v2";
 const APP_SHELL = ["/", "/manifest.webmanifest", "/assets/placeholders/city-core.svg"];
 
 self.addEventListener("install", (event) => {
@@ -18,6 +18,21 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
+
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          if (response.ok) {
+            caches.open(CACHE_NAME).then((cache) => cache.put("/", copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match("/")),
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(request).then((cached) => {

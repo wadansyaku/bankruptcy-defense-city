@@ -5,9 +5,12 @@ test.describe("破産防衛都市 PR1 UI", () => {
     await page.goto("/");
   });
 
-  test("ランディング、登録、マップ生成、ゲーム開始が動く", async ({ page }) => {
+  test("ランディング、登録、マップ生成、ゲーム開始が動く", async ({ page }, testInfo) => {
     await expect(page.getByRole("heading", { name: "破産防衛都市" })).toBeVisible();
     await page.getByRole("button", { name: "新規登録" }).click();
+    const suffix = `${testInfo.project.name}-${Date.now()}`.replace(/[^a-zA-Z0-9-]/g, "-");
+    await page.getByLabel("メールアドレス").fill(`e2e-${suffix}@example.com`);
+    await page.getByLabel("ユーザー名").fill(`E2E市長${suffix}`);
     await page.getByRole("button", { name: "登録して本社を守る" }).click();
     await expect(page.getByRole("heading", { name: /経営会議/ })).toBeVisible();
 
