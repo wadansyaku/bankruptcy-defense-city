@@ -37,6 +37,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check Cloudflare secrets
+        id: cloudflare
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::notice::Cloudflare deploy skipped because CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID is not configured."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Validate
         run: |
           npm run lint
@@ -45,17 +55,17 @@ jobs:
           npm run build
 
       - name: Apply preview D1 migrations
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'preview' }}
+        if: ${{ steps.cloudflare.outputs.configured == 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'preview' }}
         run: npx wrangler d1 migrations apply DB --env preview --remote
 
       - name: Apply production D1 migrations
-        if: ${{ github.event_name == 'push' || github.event.inputs.environment == 'production' }}
+        if: ${{ steps.cloudflare.outputs.configured == 'true' && (github.event_name == 'push' || github.event.inputs.environment == 'production') }}
         run: npx wrangler d1 migrations apply bankruptcy-defense-city --remote
 
       - name: Deploy preview
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'preview' }}
+        if: ${{ steps.cloudflare.outputs.configured == 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'preview' }}
         run: npx wrangler deploy --config wrangler.jsonc --env preview
 
       - name: Deploy production
-        if: ${{ github.event_name == 'push' || github.event.inputs.environment == 'production' }}
+        if: ${{ steps.cloudflare.outputs.configured == 'true' && (github.event_name == 'push' || github.event.inputs.environment == 'production') }}
         run: npx wrangler deploy --config wrangler.jsonc --env production
